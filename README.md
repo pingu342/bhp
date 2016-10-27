@@ -2,7 +2,6 @@
 Black Hat Python: Python Programming for Hackers and Pentesters
 
 # Reverse SSH tunneling
-
 Execute following command on your machine.
 
 	$ python rforward.py sshserver:22 -p 5555 -r httpserver:80 --user username
@@ -13,4 +12,6 @@ If httpclient connects to the sshserver:5555, the packet is forwarded to httpser
 
 `httpserver` <---*tcp*---> `sshclient` <---*reverse ssh tunneling*---> `sshserver` <---*tcp*---> `httpclient`
 
+The following command is equivalent to the above.
 
+	$ ssh -R 5555:httpserver:80 -p 22 username@sshserver
