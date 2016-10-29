@@ -2,7 +2,7 @@
 Black Hat Python: Python Programming for Hackers and Pentesters
 
 ## BHP Net Tool
-Replace netcat command with BHP Net Tool.
+Replace netcat command with python.
 
 ### TCP client
 * netcat command
@@ -132,7 +132,7 @@ The following ssh command is equivalent to the above.
 
 ### ICMP sniffer
 
-* Dispalay raw ip packet.
+* Display raw ip packet.
 
 	*For example, following command captures the ICMP packets reached 192.168.0.14.*  
 	*Note that icmp packet sent from 192.168.0.14 would not be captured.*
@@ -146,13 +146,13 @@ The following ssh command is equivalent to the above.
 		0040   24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33    $%&'()*+,-./0123
 		0050   34 35 36 37
 
-* Dispalay ip packet's protocol, source and destination.
+* Display ip packet's protocol, source and destination.
 
 		$ sudo python sniffer_ip_header_decode.py 192.168.0.14
 		Listen 192.168.0.14 ...
 		Protocol: ICMP 192.168.0.14 -> 192.168.0.14
 
-* Dispalay icmp packet's type and code.
+* Display icmp packet's type and code.
 
 		$ sudo python sniffer_with_icmp.py 192.168.0.14
 		Listen 192.168.0.14 ...
