@@ -87,7 +87,7 @@ After the ssh connection establishment, server send a command to client. Then cl
 
 *server side:*
 
-	$ python bh_sshserver.py 127.0.0.1 2200
+	$ python bh_sshserver.py 127.0.0.1 5555
 	[+] Listening for connection ...
 	[+] Got a connection!
 	[+] Authenticated!
