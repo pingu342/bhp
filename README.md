@@ -73,7 +73,7 @@ Replace netcat command with python.
 		Ctrl-C
 
 ## TCP proxy
-For example, local machine can relay the http connection.
+By execute following command, local machine comes into relaying the http connection.
 
 	$ python proxy.py 127.0.0.1 5555 www.google.com 80 False
 
@@ -95,7 +95,6 @@ For example, local machine can relay the http connection.
 ## SSH
 
 ### Execute shell command through ssh
-
 After the ssh connection establishment, server send a command to client.
 Then client execute a command and return result to server.
 
@@ -146,7 +145,7 @@ The following ssh command is equivalent to the above.
 		0040   24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33    $%&'()*+,-./0123
 		0050   34 35 36 37
 
-* Display ip packet's protocol, source and destination.
+* Display ip packet's protocol, source, and destination.
 
 		$ sudo python sniffer_ip_header_decode.py 192.168.0.14
 		Listen 192.168.0.14 ...
@@ -162,9 +161,60 @@ The following ssh command is equivalent to the above.
 * Scan the all hosts in the subnet.
 
 	*For example, local machine's ip address is 192.168.0.14 and subnet is 192.168.0.0/24.*  
-	*Following command sends UDP packet to all hosts in the subnet 192.168.0.0/24 and capture ICMP destination unreachable packet.*
+	*Following command sends UDP packet to all hosts in the subnet 192.168.0.0/24 and captures ICMP destination unreachable packet.*
 
 		$ sudo python scanner.py 192.168.0.14 192.168.0.0/24
 		Host Up: 192.168.0.1
 		Host Up: 192.168.0.12
+
+## Scapy
+
+[Scapy](http://www.secdev.org/projects/scapy/) is a powerful interactive packet manipulation program.
+
+### Setup Scapy
+
+* mac os
+
+		$ python --version
+		Python 2.7.12
+
+		$ pip --version
+		pip 8.1.2 from /opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages (python 2.7)
+		
+		$ sudo -H pip install scapy
+		$ sudo port install py27-pcapy
+		$ sudo port install py27-libdnet
+
+	*Note that pcapy and dnet should be installed by macports.*  
+	*If you install them by pip, then you might get following error.*
+
+		  File "/opt/local/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/site-packages/scapy/arch/pcapdnet.py", line 390, in next
+		s,us = h.getts()
+		AttributeError: 'NoneType' object has no attribute 'getts'
+
+### HTTP sniffer
+
+Capture GET http requests.
+
+	$ python http_sniffer.py
+
+### ARP cache poisoning
+
+For example, gateway is 192.168.0.1, attack target is 192.168.0.12.
+By executing following command, the arp cache on gateway and target is poisoned and packets from target to gateway comes into passing through local machine. On local machine, following command captures 1000 packets of target and write to 'arper.pcap' file.
+
+	$ sudo sysctl -w net.inet.ip.forwarding=1
+	$ python arper-jp.py -i en0 -t 192.168.0.12 -g 192.168.0.1 -c 1000
+
+### Setup OpenCV
+
+	$ sudo port install py27-numpy
+	$ sudo port install py27-scipy
+	$ sudo port install opencv
+	$ sudo -H pip install opencv-python
+	$ wget http://eclecti.cc/files/2008/03/haarcascade_frontalface_alt.xml
+
+### pcap file processing
+
+	$ python pic_carver.py arper.pcap
 
