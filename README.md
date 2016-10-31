@@ -171,9 +171,9 @@ The following ssh command is equivalent to the above.
 
 [Scapy](http://www.secdev.org/projects/scapy/) is a powerful interactive packet manipulation program.
 
-### Setup Scapy
+Setup scapy.
 
-* mac os
+* macOS
 
 		$ python --version
 		Python 2.7.12
@@ -184,6 +184,17 @@ The following ssh command is equivalent to the above.
 		$ sudo -H pip install scapy
 		$ sudo port install py27-pcapy
 		$ sudo port install py27-libdnet
+
+* ubuntu
+
+		$ python --version
+		Python 2.7.12
+
+		$ pip --version
+		pip 8.1.2 from /home/panasonic/.local/lib/python2.7/site-packages (python 2.7)
+
+		$ sudo -H pip install scapy
+		$ sudo port install python-pcapy
 
 	*Note that pcapy and dnet should be installed by macports.*  
 	*If you install them by pip, then you might get following error.*
@@ -206,15 +217,26 @@ By executing following command, the arp cache on gateway and target is poisoned 
 	$ sudo sysctl -w net.inet.ip.forwarding=1
 	$ python arper-jp.py -i en0 -t 192.168.0.12 -g 192.168.0.1 -c 1000
 
-### Setup OpenCV
-
-	$ sudo port install py27-numpy
-	$ sudo port install py27-scipy
-	$ sudo port install opencv
-	$ sudo -H pip install opencv-python
-	$ wget http://eclecti.cc/files/2008/03/haarcascade_frontalface_alt.xml
-
 ### pcap file processing
 
+Setup OpenCV.
+
+* macOS
+
+		$ sudo port install py27-numpy
+		$ sudo port install py27-scipy
+		$ sudo port install opencv
+		$ sudo -H pip install opencv-python
+
+* ubuntu
+
+		$ sudo apt-get install python-numpy
+		$ sudo apt-get install python-scipy
+		$ sudo apt-get install libopencv-dev python-opencv
+		$ sudo -H pip install opencv-python
+
+Execute following command to process arper.pcap file.
+
+	$ wget http://eclecti.cc/files/2008/03/haarcascade_frontalface_alt.xml
 	$ python pic_carver.py arper.pcap
 
