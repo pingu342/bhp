@@ -219,6 +219,8 @@ By executing following command, the arp cache on gateway and target is poisoned 
 
 ### pcap file processing
 
+`pic_carver.py` extracts pictures from pcap file and detects face with the use of OpenCV.
+
 Setup OpenCV.
 
 * macOS
@@ -239,4 +241,15 @@ Execute following command to process arper.pcap file.
 
 	$ wget http://eclecti.cc/files/2008/03/haarcascade_frontalface_alt.xml
 	$ python pic_carver.py arper.pcap
+
+## Attack a web server
+
+### Brute force directories and files
+
+Target is testphp.vulnweb.com.
+
+Dictionary for brute force is DirBuster-Lists.tar.bz2.
+
+	$ python content_bruter.py
+
 
