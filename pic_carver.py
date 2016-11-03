@@ -85,9 +85,9 @@ def extract_image(headers, http_payload):
 
 def face_detect(path, file_name):
     img = cv2.imread(path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt.xml")
-    rects = cascade.detectMultiScale(img, 1.3, 4,
-            cv2.cv.CV_HAAR_SCALE_IMAGE, (20,20))
+    rects = cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=1, minSize=(20, 20))
 
     if len(rects) == 0:
         return False
