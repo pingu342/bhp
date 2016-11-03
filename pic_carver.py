@@ -10,12 +10,25 @@ from scapy.all import *
 def parse_options():
     parser = argparse.ArgumentParser()
     parser.add_argument('pcap_file')
+    parser.add_argument('mac_addr')
     args = parser.parse_args()
-    return args.pcap_file
+    return (args.pcap_file, args.mac_addr)
 
 pictures_directory = "pictures"
 faces_directory = "faces"
-pcap_file = parse_options()
+pcap_file, mac_addr = parse_options()
+
+def hexdump(src, length=16):
+    result = []
+    digits = 4 if isinstance(src, unicode) else 2
+
+    for i in xrange(0, len(src), length):
+        s = src[i:i+length]
+        hexa = b' '.join(["%0*X" % (digits, ord(x)) for x in s])
+        text = b''.join([x if 0x20 <= ord(x) < 0x7f else b'.' for x in s])
+        result.append( b"%04X   %-*s   %s" % (i, length*(digits + 1), hexa, text) )
+
+    print b'\n'.join(result)
 
 def get_http_headers(http_payload):
     try:
@@ -38,12 +51,22 @@ def extract_image(headers, http_payload):
     image = None
     image_type = None
 
+    content_len = 0
+    if 'Content-Length' in headers:
+        content_len = int(headers['Content-Length'])
+
     try:
         if "image" in headers['Content-Type']:
+
             # 画像種別と画像本体の取得
             image_type = headers['Content-Type'].split("/")[1]
 
             image = http_payload[http_payload.index("\r\n\r\n")+4:]
+
+            # Content-Lengthヘッダがある場合はサイズを確認
+            if content_len != 0:
+                if len(image) != content_len:
+                    return None, None
 
             # 画像が圧縮されている場合は解答
             try:
@@ -54,6 +77,7 @@ def extract_image(headers, http_payload):
                         image = zlib.decompress(image)
             except:
                 pass
+
     except:
         return None, None
 
@@ -82,53 +106,84 @@ def http_assembler(pcap_file):
     carved_images = 0
     faces_detected = 0
 
+    # type(a) = <class 'scapy.plist.PacketList'>
     a = rdpcap(pcap_file)
 
+    # type(sessions) = <type 'dict'>
     sessions = a.sessions()
 
     for session in sessions:
+        # session = "TCP 192.168.0.12:52488 > 183.79.249.124:80"
+        # session = "TCP 192.168.0.12:52498 > 183.79.249.124:80"
+        #  ...
 
-        http_payload = ""
+        # if session != "TCP 183.79.249.124:80 > 192.168.0.12:52490":
+        #     continue
+
+        http_payloads = [];
 
         for packet in sessions[session]:
 
             try:
-                if packet[TCP].dport == 80 or packet[TCP].sport == 80:
-                    # ストリームの再構築
-                    http_payload += str(packet[TCP].payload)
-            except:
+
+                # サーバーからのレスポンスのみを取り出す
+                if packet[TCP].sport == 80:
+
+                    # `python arper-jp.py` が出力したpcapファイルには、
+                    # 下図(1)(2)両方のパケットがキャプチャされている。
+                    #   サーバー <-(1)-> 中継 <-(2)-> ターゲット
+                    # 
+                    # つまりサーバーからターゲットへのレスポンスパケットは、
+                    # (1)(2)の2箇所でキャプチャされている。
+                    # そこで(2)の箇所でキャプチャされたパケットだけを取り出す。
+                    #  mac_addr: パケット中継するホストのインターフェース
+
+                    if packet[Ether].src == mac_addr:
+
+                        # ストリームの再構築
+                        payload = str(packet[TCP].payload)
+                        if re.match('^HTTP/\d\.\d 200 OK\r\n', payload):
+                            http_payloads.append(payload)
+                        else:
+                            if http_payloads[-1] is not None:
+                                http_payloads[-1] += str(payload)
+
+            except Exception as e:
                 pass
 
-        headers = get_http_headers(http_payload)
+        for http_payload in http_payloads:
 
-        if headers is None:
-            continue
+            headers = get_http_headers(http_payload)
 
-        image, image_type = extract_image(headers, http_payload)
+            # Content-Typeヘッダがない場合はcontinue
+            if headers is None:
+                continue
 
-        if image is not None and image_type is not None:
+            image, image_type = extract_image(headers, http_payload)
 
-            # 画像の保存
-            file_name = "%s-pic_carver_%d.%s" % (
-                    pcap_file, carved_images, image_type)
+            if image is not None and image_type is not None:
 
-            fd = open("%s/%s" % (pictures_directory, file_name), "wb")
+                # 画像の保存
+                file_name = "%s-pic_carver_%d.%s" % (
+                        pcap_file, carved_images, image_type)
 
-            fd.write(image)
-            fd.close()
+                fd = open("%s/%s" % (pictures_directory, file_name), "wb")
 
-            carved_images += 1
+                fd.write(image)
+                fd.close()
 
-            # 顔検出
-            try:
-                result = face_detect("%s/%s" %
-                        (pictures_directory, file_name), file_name)
+                carved_images += 1
 
-                if result is True:
-                    faces_detected += 1
+                # 顔検出
+                try:
+                    result = face_detect("%s/%s" %
+                            (pictures_directory, file_name), file_name)
 
-            except:
-                pass
+                    if result is True:
+                        faces_detected += 1
+
+                except:
+                    pass
 
     return carved_images, faces_detected
 

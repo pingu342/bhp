@@ -229,6 +229,7 @@ Setup OpenCV.
 		$ sudo port install py27-scipy
 		$ sudo port install opencv
 		$ sudo -H pip install opencv-python
+		$ wget http://eclecti.cc/files/2008/03/haarcascade_frontalface_alt.xml
 
 * ubuntu
 
@@ -236,11 +237,13 @@ Setup OpenCV.
 		$ sudo apt-get install python-scipy
 		$ sudo apt-get install libopencv-dev python-opencv
 		$ sudo -H pip install opencv-python
+		$ wget http://eclecti.cc/files/2008/03/haarcascade_frontalface_alt.xml
 
-Execute following command to process arper.pcap file.
+Execute following command.
+Specify the pcap file made by `arper-jp.py` to `pcap_file`.
+Specify the MAC address of machine you run `arper-jp.py` to `mac_addr`.
 
-	$ wget http://eclecti.cc/files/2008/03/haarcascade_frontalface_alt.xml
-	$ python pic_carver.py arper.pcap
+	$ python pic_carver.py pcap_file mac_addr
 
 ## Attack a web server
 
