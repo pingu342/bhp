@@ -39,7 +39,7 @@ sniffer.bind((host, 0))
 
 # キャプチャー結果にIPヘッダーを含めるように指定
 if os.name == "nt":
-    sniffer.ioctrl(socket.SIO_RCVALL, socket.RCVALL_ON)
+    sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
 
 # パケットの読み込み
 while True:
