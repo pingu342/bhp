@@ -56,5 +56,5 @@ sniffer.close()
 
 # Windowsの場合はプロミスキャスモードを無効化
 if os.name == "nt":
-    sniffer.ioctrl(socket.SIO_RCVALL, socket.RCVALL_OFF)
+    sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
 

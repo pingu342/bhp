@@ -65,7 +65,7 @@ sniffer.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
 
 # キャプチャー結果にIPヘッダーを含めるように指定
 if os.name == "nt":
-    sniffer.ioctrl(socket.SIO_RCVALL, socket.RCVALL_ON)
+    sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
 
 try:
     while True:
@@ -84,5 +84,5 @@ except KeyboardInterrupt:
 
     # Windowsの場合はプロミスキャスモードを無効化
     if os.name == "nt":
-        sniffer.ioctrl(socket.SIO_RCVALL, socket.RCVALL_OFF)
+        sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
 
