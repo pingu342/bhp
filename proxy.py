@@ -35,9 +35,9 @@ def server_loop(local_host, local_port, remote_host, remote_port, receive_first)
 def main():
 
     # コマンドライン引数の解釈
-    if len(sys.argv[1:]) != 5:
-        print "Usage: ./proxy.py [localhost] [localport] [remotehost] [remoteport] [receivefirst]"
-        print "Example: ./proxy.py 127.0.0.1 9000 10.12.132.1 9000 True"
+    if len(sys.argv[1:]) != 6:
+        print "Usage: ./proxy.py [localhost] [localport] [remotehost] [remoteport] [receivefirst] [timeout]"
+        print "Example: ./proxy.py 127.0.0.1 9000 10.12.132.1 9000 True 2"
         sys.exit(0)
 
     # ローカル側での通信待受を行うための設定
@@ -55,6 +55,9 @@ def main():
         receive_first = True
     else:
         receive_first = False
+
+    # ローカル側、リモート側からのデータ受信待ち時間
+    receive_timeout = int(sys.argv[6])
 
     # 通信待機ソケットの起動
     server_loop(local_host, local_port, remote_host, remote_port, receive_first)
@@ -143,7 +146,7 @@ def receive_from(connection):
     buffer = ""
 
     # タイムアウト値を2秒に設定(ターゲットに応じた調整が必要)
-    connection.settimeout(2)
+    connection.settimeout(receive_timeout)
 
     try:
         # データを受け取らなくなるかタイムアウトになるまでデータを受信してbufferに格納
