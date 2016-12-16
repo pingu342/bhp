@@ -4,7 +4,7 @@ import sys
 import socket
 import threading
 
-def server_loop(local_host, local_port, remote_host, remote_port, receive_first):
+def server_loop(local_host, local_port, remote_host, remote_port, receive_first, receive_timeout):
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -28,7 +28,7 @@ def server_loop(local_host, local_port, remote_host, remote_port, receive_first)
         # リモートホストと通信するためのスレッドを開始
         proxy_thread = threading.Thread(
                 target = proxy_handler,
-                args = (client_socket, remote_host, remote_port, receive_first))
+                args = (client_socket, remote_host, remote_port, receive_first, receive_timeout))
 
         proxy_thread.start()
 
@@ -60,9 +60,9 @@ def main():
     receive_timeout = int(sys.argv[6])
 
     # 通信待機ソケットの起動
-    server_loop(local_host, local_port, remote_host, remote_port, receive_first)
+    server_loop(local_host, local_port, remote_host, remote_port, receive_first, receive_timeout)
 
-def proxy_handler(client_socket, remote_host, remote_port, receive_first):
+def proxy_handler(client_socket, remote_host, remote_port, receive_first, receive_timeout):
 
     # リモートホストへの接続
     remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,7 +71,7 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
     # 必要ならリモートホストからデータを受信
     if receive_first:
 
-        remote_buffer = receive_from(remote_socket)
+        remote_buffer = receive_from(remote_socket, receive_timeout)
         hexdump(remote_buffer)
 
         # 受信データ処理関数にデータを受け渡し
@@ -88,7 +88,7 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
     while True:
 
         # ローカルホストからデータ受信
-        local_buffer = receive_from(client_socket)
+        local_buffer = receive_from(client_socket, receive_timeout)
 
         if len(local_buffer):
 
@@ -104,7 +104,7 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
             print "[==>] Send to remote."
 
         # 応答の受信
-        remote_buffer = receive_from(remote_socket)
+        remote_buffer = receive_from(remote_socket, receive_timeout)
 
         if len(remote_buffer):
             print "[<==] Received %d bytes from remote." % len(remote_buffer)
@@ -141,7 +141,7 @@ def hexdump(src, length=16):
 
     print b'\n'.join(result)
 
-def receive_from(connection):
+def receive_from(connection, receive_timeout):
 
     buffer = ""
 
