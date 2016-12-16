@@ -160,6 +160,7 @@ The following ssh command is equivalent to the above.
 
 * Scan the all hosts in the subnet.
 
+	*[netaddr](https://pythonhosted.org/netaddr/installation.html) are required.*  
 	*For example, local machine's ip address is 192.168.0.14 and subnet is 192.168.0.0/24.*  
 	*Following command sends UDP packet to all hosts in the subnet 192.168.0.0/24 and captures ICMP destination unreachable packet.*
 
@@ -255,4 +256,11 @@ Dictionary for brute force is DirBuster-Lists.tar.bz2.
 
 	$ python content_bruter.py
 
+## Appendix
+
+* How to set an HTTP proxy in Python 2.7?
+
+		>set HTTP_PROXY=http://proxy.com:port
+		>set HTTPS_PROXY=https://proxy.com:port
+		>pip install netaddr
 
