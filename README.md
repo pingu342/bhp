@@ -215,7 +215,14 @@ Capture GET http requests.
 For example, gateway is 192.168.0.1, attack target is 192.168.0.12.
 By executing following command, the arp cache on gateway and target is poisoned and packets from target to gateway comes into passing through local machine. On local machine, following command captures 1000 packets of target and write to 'arper.pcap' file.
 
+* macOS
+
 	$ sudo sysctl -w net.inet.ip.forwarding=1
+	$ python arper-jp.py -i en0 -t 192.168.0.12 -g 192.168.0.1 -c 1000
+
+* ubuntu
+
+	$ sudo sysctl -w net.ipv4.ip_forward=1
 	$ python arper-jp.py -i en0 -t 192.168.0.12 -g 192.168.0.1 -c 1000
 
 ### pcap file processing
